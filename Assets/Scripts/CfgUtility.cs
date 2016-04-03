@@ -8,11 +8,18 @@ using System.Reflection;
 public class CfgUtility<T> where T : ICfg, new()
 {
 
+    public Dictionary<int, T> GetFileDict(string path, string fileName)
+    {
+        List<string[]> list = FileToList(path, fileName);
+        List<Hashtable> tableList = ListToHashtable(list);
+        Dictionary<int, T> dict = TableListToDict(tableList);
+        return dict;
+    }
 
     /// <summary>
     /// Put CSV data into a 2d list
     /// </summary>
-    public List<string[]> FileToList(string path, string fileName)
+    private List<string[]> FileToList(string path, string fileName)
     {
         List<string[]> list = new List<string[]>();
         StreamReader sr = null;
@@ -36,7 +43,11 @@ public class CfgUtility<T> where T : ICfg, new()
         return list;
     }
 
-    public List<Hashtable> ListToHashtable(List<string[]> list)
+    /// <summary>
+    /// Use Hashtable
+    /// </summary>
+
+    private List<Hashtable> ListToHashtable(List<string[]> list)
     {
         List<Hashtable> tableList = new List<Hashtable>();
         string[] sKey = list[0];
@@ -56,7 +67,7 @@ public class CfgUtility<T> where T : ICfg, new()
         return tableList;
     }
 
-    public string UpperFirst(string s)
+    private string UpperFirst(string s)
     {
         return s.Substring(0, 1).ToUpper() + s.Substring(1);
     }
@@ -65,7 +76,7 @@ public class CfgUtility<T> where T : ICfg, new()
     /// <summary>
     /// Use Dict to hold all data object of T
     /// </summary>
-    public Dictionary<int, T> TableListToDict(List<Hashtable> tableList)
+    private Dictionary<int, T> TableListToDict(List<Hashtable> tableList)
     {
         Dictionary<int, T> dict = new Dictionary<int, T>();
         Hashtable sRow;
@@ -81,7 +92,7 @@ public class CfgUtility<T> where T : ICfg, new()
     /// <summary>
     /// Use table's data to fill a object of T
     /// </summary>
-    public T HashtableToT(Hashtable table)
+    private T HashtableToT(Hashtable table)
     {
         T t = new T();
         PropertyInfo[] info = t.GetType().GetProperties();
