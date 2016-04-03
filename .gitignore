@@ -48,3 +48,5 @@ Library
 *.sln
 *.cache
 *.suo
+UnityVS
+UnityVS*

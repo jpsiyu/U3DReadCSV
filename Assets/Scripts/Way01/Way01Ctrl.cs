@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class FileController : MonoBehaviour {
+public class Way01Ctrl : MonoBehaviour
+{
 
     private string path;
     private string fileName;
@@ -13,10 +14,9 @@ public class FileController : MonoBehaviour {
         fileName = "copy.csv";
 
         Way01CSV.GetInstance().LoadFile(path, fileName);
+        Way01Cfg cfg = Way01CSV.GetInstance().GetCfg(1001);
+        Debug.Log(cfg.ToString());
 
-        foreach (string s in Way01CSV.GetInstance().ArrayData) {
-            Debug.Log(s);
-        }
 	}
 	
 
