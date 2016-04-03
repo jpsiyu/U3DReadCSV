@@ -1,4 +1,4 @@
-id,desc,lock,cost,reward,cd
+id,desc,lockLv,cost,reward,cd
 int,string,int,int,int,int
 1001,copy 1,1,100,1000,5
 1002,copy 2,2,200,2000,5
