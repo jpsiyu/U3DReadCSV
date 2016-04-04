@@ -9,15 +9,14 @@ public enum CfgType {
 }
 
 
+
 public class CfgCtrl
 {
 
     private static CfgCtrl cfgCtrl;
     private Dictionary<CfgType, ICfgCtrlItem> dictItem;
-    private string path;
 
     private CfgCtrl() {
-        path = string.Format("{0}/../CSV", Application.dataPath);
         dictItem = new Dictionary<CfgType, ICfgCtrlItem>();
         InitItemDict();
     }
@@ -32,12 +31,8 @@ public class CfgCtrl
     }
 
     private void InitItemDict() {
-        Dictionary<int, CopyCfg> copyDict = new CfgUtility<CopyCfg>().GetFileDict(path, "copy.csv");
-        Dictionary<int, ShopCfg> shopDict = new CfgUtility<ShopCfg>().GetFileDict(path, "shop.csv");
-
-
-        dictItem.Add(CfgType.Copy, new CfgCtrlItem<CopyCfg>(copyDict));
-        dictItem.Add(CfgType.Shop, new CfgCtrlItem<ShopCfg>(shopDict));
+        dictItem.Add(CfgType.Copy, new CfgCtrlItem<CopyCfg>("copy.csv"));
+        dictItem.Add(CfgType.Shop, new CfgCtrlItem<ShopCfg>("shop.csv"));
 
     }
 
@@ -51,11 +46,14 @@ public interface ICfgCtrlItem {
     object GetCfg(int dKey);
 }
 
-public class CfgCtrlItem<T> : ICfgCtrlItem {
+public class CfgCtrlItem<T> : ICfgCtrlItem where T:ICfg, new()
+{
     private Dictionary<int, T> dict;
+    private string path;
 
-    public CfgCtrlItem(Dictionary<int, T> d) {
-        dict = d;
+    public CfgCtrlItem(string fileName){
+        path = string.Format("{0}/../CSV", Application.dataPath);
+        dict = new CfgUtility<T>().GetFileDict(path, fileName);
     }
 
     public object GetCfg(int dKey)
