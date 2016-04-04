@@ -8,17 +8,22 @@ public enum CfgType {
     Shop,
 }
 
+public struct CfgStruct {
+    public Dictionary<int, CopyCfg> copyCfg;
+    public Dictionary<int, ShopCfg> shopCfg;
+}
+
 public class CfgCtrl
 {
 
     private static CfgCtrl cfgCtrl;
-    private ArrayList list;
+    private CfgStruct cfgStruct;
     private int enumLen = 2;
     string path = string.Format("{0}/../CSV", Application.dataPath);
 
     private CfgCtrl() {
-        list = new ArrayList(System.Enum.GetNames(Type.GetType("CfgType")).Length);
-        InitList();
+        cfgStruct = new CfgStruct();
+        InitDictStruct();
     }
 
     public static CfgCtrl Instance{ 
@@ -30,35 +35,26 @@ public class CfgCtrl
         }
     }
 
-
-    private void InitList() {
+    private void InitDictStruct() {
         Dictionary<int, CopyCfg> copyDict = new CfgUtility<CopyCfg>().GetFileDict(path, "copy.csv");
         Dictionary<int, ShopCfg> shopDict = new CfgUtility<ShopCfg>().GetFileDict(path, "shop.csv");
-        list.Add(copyDict);
-        list.Add(shopDict);
 
+        cfgStruct.copyCfg = copyDict;
+        cfgStruct.shopCfg = shopDict;
     }
 
-    public object GetCfg(CfgType ct, int dkey) {
-        object o = null;
-        try
-        {
-            switch (ct)
-            {
-                case CfgType.Copy:
-                    o = ((Dictionary<int, CopyCfg>)list[(int)ct])[dkey];
-                    break;
-                case CfgType.Shop:
-                    o = ((Dictionary<int, ShopCfg>)list[(int)ct])[dkey];
-                    break;
-                default:
-                    break;
-            }
-            return o;
-        }
-        catch (Exception e) {
-            Debug.LogError(string.Format("key not found:{0}", dkey));
-            return null;
-        }
+    public object GetCfg(CfgType ct, int dkey)
+    {
+        if (ct == CfgType.Copy)
+            if(cfgStruct.copyCfg.ContainsKey(dkey))
+                return cfgStruct.copyCfg[dkey];
+        if (ct == CfgType.Shop)
+            if(cfgStruct.shopCfg.ContainsKey(dkey))
+                return cfgStruct.shopCfg[dkey];
+
+        Debug.LogError("key not found: " + dkey);
+        return null;
     }
+
+
 }
