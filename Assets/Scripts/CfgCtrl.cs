@@ -2,27 +2,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Reflection;
 
 public enum CfgType { 
     Copy,
     Shop,
 }
 
-public struct CfgStruct {
-    public Dictionary<int, CopyCfg> copyCfg;
-    public Dictionary<int, ShopCfg> shopCfg;
-}
 
 public class CfgCtrl
 {
 
     private static CfgCtrl cfgCtrl;
-    private CfgStruct cfgStruct;
+    private Dictionary<CfgType, ICfgCtrlItem> dictItem;
     private int enumLen = 2;
     string path = string.Format("{0}/../CSV", Application.dataPath);
 
     private CfgCtrl() {
-        cfgStruct = new CfgStruct();
+        dictItem = new Dictionary<CfgType, ICfgCtrlItem>();
         InitDictStruct();
     }
 
@@ -39,22 +36,37 @@ public class CfgCtrl
         Dictionary<int, CopyCfg> copyDict = new CfgUtility<CopyCfg>().GetFileDict(path, "copy.csv");
         Dictionary<int, ShopCfg> shopDict = new CfgUtility<ShopCfg>().GetFileDict(path, "shop.csv");
 
-        cfgStruct.copyCfg = copyDict;
-        cfgStruct.shopCfg = shopDict;
+        ICfgCtrlItem itemCopy = new CfgCtrlItem<CopyCfg>(copyDict);
+        ICfgCtrlItem itemShop = new CfgCtrlItem<ShopCfg>(shopDict);
+
+        dictItem.Add(CfgType.Copy, itemCopy);
+        dictItem.Add(CfgType.Shop, itemShop);
+
     }
 
-    public object GetCfg(CfgType ct, int dkey)
+    public object GetCfg(CfgType ct, int dkey) {
+        return dictItem[ct].GetCfg(dkey);
+    }
+
+}
+
+public interface ICfgCtrlItem { 
+    object GetCfg(int dKey);
+}
+
+public class CfgCtrlItem<T> : ICfgCtrlItem {
+    private Dictionary<int, T> dict;
+
+    public CfgCtrlItem(Dictionary<int, T> d) {
+        dict = d;
+    }
+
+    public object GetCfg(int dKey)
     {
-        if (ct == CfgType.Copy)
-            if(cfgStruct.copyCfg.ContainsKey(dkey))
-                return cfgStruct.copyCfg[dkey];
-        if (ct == CfgType.Shop)
-            if(cfgStruct.shopCfg.ContainsKey(dkey))
-                return cfgStruct.shopCfg[dkey];
-
-        Debug.LogError("key not found: " + dkey);
-        return null;
+        if (dict.ContainsKey(dKey))
+            return dict[dKey];
+        else
+            Debug.LogError("key not found: " + dKey);
+            return null;
     }
-
-
 }
