@@ -15,12 +15,12 @@ public class CfgCtrl
 
     private static CfgCtrl cfgCtrl;
     private Dictionary<CfgType, ICfgCtrlItem> dictItem;
-    private int enumLen = 2;
-    string path = string.Format("{0}/../CSV", Application.dataPath);
+    private string path;
 
     private CfgCtrl() {
+        path = string.Format("{0}/../CSV", Application.dataPath);
         dictItem = new Dictionary<CfgType, ICfgCtrlItem>();
-        InitDictStruct();
+        InitItemDict();
     }
 
     public static CfgCtrl Instance{ 
@@ -32,15 +32,13 @@ public class CfgCtrl
         }
     }
 
-    private void InitDictStruct() {
+    private void InitItemDict() {
         Dictionary<int, CopyCfg> copyDict = new CfgUtility<CopyCfg>().GetFileDict(path, "copy.csv");
         Dictionary<int, ShopCfg> shopDict = new CfgUtility<ShopCfg>().GetFileDict(path, "shop.csv");
 
-        ICfgCtrlItem itemCopy = new CfgCtrlItem<CopyCfg>(copyDict);
-        ICfgCtrlItem itemShop = new CfgCtrlItem<ShopCfg>(shopDict);
 
-        dictItem.Add(CfgType.Copy, itemCopy);
-        dictItem.Add(CfgType.Shop, itemShop);
+        dictItem.Add(CfgType.Copy, new CfgCtrlItem<CopyCfg>(copyDict));
+        dictItem.Add(CfgType.Shop, new CfgCtrlItem<ShopCfg>(shopDict));
 
     }
 
